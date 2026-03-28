@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .services.s3_service import S3Service
+from mangum import Mangum
 
 app = FastAPI(title="Twitter Statistics API")
+
 s3_service = S3Service()
 
 app.add_middleware(
@@ -20,3 +22,5 @@ async def root():
 @app.get("/stats")
 async def get_stats():
     return s3_service.get_user_stats()
+
+handler = Mangum(app)
