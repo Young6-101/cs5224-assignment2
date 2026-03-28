@@ -21,6 +21,7 @@ class S3Service:
                 Prefix=self.results_key
             )
 
+            contents = resp.get("Contents", [])
             part_keys = [o["Key"] for o in contents if o["Key"].split("/")[-1].startswith("part-")]
 
             if not part_keys:
