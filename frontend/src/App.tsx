@@ -7,6 +7,7 @@ interface TwitterUser {
 }
 
 function App() {
+  
   const [users, setUsers] = useState<TwitterUser[]>([])
 
   useEffect(() => {
