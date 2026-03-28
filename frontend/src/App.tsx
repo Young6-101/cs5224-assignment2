@@ -10,10 +10,10 @@ interface TwitterUser {
 
 function App() {
   const [users, setUsers] = useState<TwitterUser[]>([])
-  
+
   const [error, setError] = useState<string | null>(null)
 
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
+  const apiBaseUrl = 'https://est3jk9fu4.execute-api.ap-southeast-1.amazonaws.com/prod'
 
   useEffect(() => {
     fetch(`${apiBaseUrl}/stats`)

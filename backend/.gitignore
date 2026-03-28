@@ -6,5 +6,10 @@ dist/
 wheels/
 *.egg-info
 
+# Lambda build artifacts
+package/
+backend-lambda.zip
+requirements.txt
+
 # Virtual environments
 .venv
