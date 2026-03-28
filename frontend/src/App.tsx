@@ -10,6 +10,7 @@ interface TwitterUser {
 
 function App() {
   const [users, setUsers] = useState<TwitterUser[]>([])
+  
   const [error, setError] = useState<string | null>(null)
 
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
