@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { GradientHeading } from '@/components/ui/gradient-heading'
 import { TweetGrid } from '@/components/ui/tweet-grid'
 
@@ -8,13 +8,26 @@ interface TwitterUser {
   followees: number
 }
 
+const TARGET_USER_IDS = ['214328887', '107830991']
+const MAX_RENDER_COUNT = 100
+
 function App() {
   const [users, setUsers] = useState<TwitterUser[]>([])
   const [loading, setLoading] = useState(true)
-  
   const [error, setError] = useState<string | null>(null)
 
   const apiBaseUrl = 'https://est3jk9fu4.execute-api.ap-southeast-1.amazonaws.com/prod'
+
+  const visibleUsers = useMemo(() => {
+    const forcedUsers = TARGET_USER_IDS
+      .map((targetUserId) => users.find((user) => user.user_id === targetUserId))
+      .filter((user): user is TwitterUser => Boolean(user))
+
+    const forcedUserIds = new Set(forcedUsers.map((user) => user.user_id))
+    const otherUsers = users.filter((user) => !forcedUserIds.has(user.user_id))
+
+    return [...forcedUsers, ...otherUsers].slice(0, MAX_RENDER_COUNT)
+  }, [users])
 
   useEffect(() => {
     const loadStats = async () => {
@@ -77,7 +90,7 @@ function App() {
         <div className="flex w-full items-center justify-center">
           <TweetGrid
             className="w-full max-w-7xl"
-            users={users}
+            users={visibleUsers}
             columns={4}
             spacing="lg"
           />
