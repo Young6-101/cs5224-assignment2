@@ -20,13 +20,17 @@ function App() {
 
   const visibleUsers = useMemo(() => {
     const forcedUsers = TARGET_USER_IDS
-      .map((targetUserId) => users.find((user) => user.user_id === targetUserId))
+      .map((targetUserId) =>
+        users.find((user) => String(user.user_id) === targetUserId),
+      )
       .filter((user): user is TwitterUser => Boolean(user))
 
-    const forcedUserIds = new Set(forcedUsers.map((user) => user.user_id))
-    const otherUsers = users.filter((user) => !forcedUserIds.has(user.user_id))
+    const forcedUserIds = new Set(forcedUsers.map((user) => String(user.user_id)))
+    const otherUsers = users.filter((user) => !forcedUserIds.has(String(user.user_id)))
+    const shuffledOtherUsers = [...otherUsers].sort(() => Math.random() - 0.5)
+    const remainingSlots = Math.max(0, MAX_RENDER_COUNT - forcedUsers.length)
 
-    return [...forcedUsers, ...otherUsers].slice(0, MAX_RENDER_COUNT)
+    return [...forcedUsers, ...shuffledOtherUsers.slice(0, remainingSlots)]
   }, [users])
 
   useEffect(() => {
@@ -43,7 +47,12 @@ function App() {
         }
 
         const data = JSON.parse(rawText) as TwitterUser[]
-        setUsers(data)
+        setUsers(
+          data.map((user) => ({
+            ...user,
+            user_id: String(user.user_id),
+          })),
+        )
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to load user statistics'
         setError(message)
