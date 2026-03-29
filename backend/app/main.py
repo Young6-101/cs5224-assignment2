@@ -23,4 +23,4 @@ async def root():
 async def get_stats():
     return s3_service.get_user_stats()
 
-handler = Mangum(app)
+handler = Mangum(app, api_gateway_base_path="/prod")

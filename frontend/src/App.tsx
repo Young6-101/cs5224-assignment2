@@ -10,16 +10,35 @@ interface TwitterUser {
 
 function App() {
   const [users, setUsers] = useState<TwitterUser[]>([])
-
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const apiBaseUrl = 'https://est3jk9fu4.execute-api.ap-southeast-1.amazonaws.com/prod'
 
   useEffect(() => {
-    fetch(`${apiBaseUrl}/stats`)
-      .then(res => res.json())
-      .then((data: TwitterUser[]) => setUsers(data))
-      .catch(() => setError('Failed to load user statistics'))
+    const loadStats = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        const res = await fetch(`${apiBaseUrl}/stats`)
+        const rawText = await res.text()
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status} ${res.statusText}: ${rawText}`)
+        }
+
+        const data = JSON.parse(rawText) as TwitterUser[]
+        setUsers(data)
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to load user statistics'
+        setError(message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    void loadStats()
   }, [apiBaseUrl])
 
   return (
@@ -42,7 +61,17 @@ function App() {
           </GradientHeading>
         </div>
 
-        {error && <p className="mb-4 text-red-600">{error}</p>}
+        {error && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            <p className="font-semibold">Failed to load data</p>
+            <p className="mt-1 break-all">{error}</p>
+            <p className="mt-2 break-all text-red-600">API: {apiBaseUrl}/stats</p>
+          </div>
+        )}
+
+        {loading && !error && (
+          <p className="mb-4 text-sm text-gray-600">Loading data from {apiBaseUrl}/stats ...</p>
+        )}
 
         <div className="flex w-full items-center justify-center">
           <TweetGrid
