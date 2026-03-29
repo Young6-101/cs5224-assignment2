@@ -25,12 +25,15 @@ class S3Service:
             if not part_keys:
                 return []
 
-            obj = self.s3_client.get_object(
-                Bucket=self.bucket,
-                Key=part_keys[0]
-            )
+            dataframes = []
+            for key in part_keys:
+                obj = self.s3_client.get_object(
+                    Bucket=self.bucket,
+                    Key=key
+                )
+                dataframes.append(pd.read_csv(io.BytesIO(obj['Body'].read())))
 
-            df = pd.read_csv(io.BytesIO(obj['Body'].read()))
+            df = pd.concat(dataframes, ignore_index=True)
 
             df = df.fillna(0)
             df['user_id'] = df['user_id'].astype(int)

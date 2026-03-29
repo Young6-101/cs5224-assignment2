@@ -11,6 +11,7 @@ interface TwitterUser {
 function App() {
   const [users, setUsers] = useState<TwitterUser[]>([])
   const [loading, setLoading] = useState(true)
+  
   const [error, setError] = useState<string | null>(null)
 
   const apiBaseUrl = 'https://est3jk9fu4.execute-api.ap-southeast-1.amazonaws.com/prod'
